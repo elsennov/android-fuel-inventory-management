@@ -1,4 +1,4 @@
-package com.mariniana.fim.api
+package com.mariniana.fuelinventorymanagement.api
 
 import okhttp3.Interceptor
 import okhttp3.Response

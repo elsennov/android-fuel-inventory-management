@@ -1,4 +1,4 @@
-package com.mariniana.fim.utils
+package com.mariniana.fuelinventorymanagement.utils
 
 import android.content.Context
 import org.jetbrains.anko.connectivityManager

@@ -7,14 +7,12 @@ android {
     buildToolsVersion "25.0.2"
 
     defaultConfig {
-        applicationId "com.novraditya.recipee"
+        applicationId "com.mariniana.fuelinventorymanagement"
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-        buildConfigField "String", "BASE_URL", "\"http://private-b28513-recipee.apiary-mock.com\""
     }
 
     buildTypes {
@@ -43,6 +41,7 @@ def rxJava2Version = '2.0.6'
 def rxAndroidVersion = '2.0.1'
 def rxNavi2Version = '2.0'
 def rxBindingVersion = '2.0.0'
+def firebaseVersion = '10.2.1'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -51,6 +50,10 @@ dependencies {
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
     compile "com.android.support:design:${supportLibVersion}"
     compile "com.android.support:recyclerview-v7:${supportLibVersion}"
+
+    compile "com.google.firebase:firebase-core:${firebaseVersion}"
+    compile "com.google.firebase:firebase-database:${firebaseVersion}"
+    compile "com.google.firebase:firebase-messaging:${firebaseVersion}"
 
     // Kotlin
     compile 'org.jetbrains.kotlin:kotlin-stdlib:1.1.1'
@@ -88,3 +91,5 @@ dependencies {
 repositories {
     mavenCentral()
 }
+
+apply plugin: 'com.google.gms.google-services'

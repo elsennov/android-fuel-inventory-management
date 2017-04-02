@@ -1,4 +1,4 @@
-package com.mariniana.fim.api.error
+package com.mariniana.fuelinventorymanagement.api.error
 
 import java.io.IOException
 import java.net.UnknownHostException

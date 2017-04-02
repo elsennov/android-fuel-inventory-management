@@ -1,6 +1,6 @@
-package com.mariniana.fim
+package com.mariniana.fuelinventorymanagement
 
-import com.mariniana.fim.api.error.*
+import com.mariniana.fuelinventorymanagement.api.error.*
 import io.reactivex.Observable
 import io.reactivex.functions.Function
 

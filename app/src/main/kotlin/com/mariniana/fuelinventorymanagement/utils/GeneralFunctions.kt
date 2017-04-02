@@ -1,4 +1,4 @@
-package com.mariniana.fim.utils
+package com.mariniana.fuelinventorymanagement.utils
 
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson

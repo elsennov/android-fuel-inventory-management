@@ -1,4 +1,4 @@
-package com.mariniana.fim.api
+package com.mariniana.fuelinventorymanagement.api
 
 import dagger.Module
 import dagger.Provides

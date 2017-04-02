@@ -1,9 +1,9 @@
-package com.mariniana.fim
+package com.mariniana.fuelinventorymanagement
 
-import com.mariniana.fim.api.ApiModule
-import com.mariniana.fim.api.RetrofitModule
-import com.mariniana.fim.main.MainActivityPresenter
-import com.mariniana.fim.main.MainModule
+import com.mariniana.fuelinventorymanagement.api.ApiModule
+import com.mariniana.fuelinventorymanagement.api.RetrofitModule
+import com.mariniana.fuelinventorymanagement.main.MainActivityPresenter
+import com.mariniana.fuelinventorymanagement.main.MainModule
 import dagger.Component
 import javax.inject.Singleton
 

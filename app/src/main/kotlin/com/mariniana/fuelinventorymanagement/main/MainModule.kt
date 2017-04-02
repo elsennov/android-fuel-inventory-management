@@ -1,6 +1,6 @@
-package com.mariniana.fim.main
+package com.mariniana.fuelinventorymanagement.main
 
-import com.mariniana.fim.api.ApiManager
+import com.mariniana.fuelinventorymanagement.api.ApiManager
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

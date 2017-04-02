@@ -1,12 +1,12 @@
-package com.mariniana.fim.api
+package com.mariniana.fuelinventorymanagement.api
 
 import android.app.Application
 import android.content.Context
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import com.mariniana.fim.BuildConfig
-import com.mariniana.fim.utils.LogUtils
-import com.mariniana.fim.utils.buildGson
-import com.mariniana.fim.utils.isNetworkAvailable
+import com.mariniana.fuelinventorymanagement.BuildConfig
+import com.mariniana.fuelinventorymanagement.utils.LogUtils
+import com.mariniana.fuelinventorymanagement.utils.buildGson
+import com.mariniana.fuelinventorymanagement.utils.isNetworkAvailable
 import dagger.Module
 import dagger.Provides
 import io.reactivex.schedulers.Schedulers

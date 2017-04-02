@@ -1,4 +1,4 @@
-package com.mariniana.fim
+package com.mariniana.fuelinventorymanagement
 
 import android.app.Application
 import dagger.Module

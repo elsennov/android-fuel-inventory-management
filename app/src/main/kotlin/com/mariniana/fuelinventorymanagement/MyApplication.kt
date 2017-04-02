@@ -1,7 +1,7 @@
-package com.mariniana.fim
+package com.mariniana.fuelinventorymanagement
 
 import android.app.Application
-import com.mariniana.fim.utils.LogUtils
+import com.mariniana.fuelinventorymanagement.utils.LogUtils
 
 /**
  * Created by elsennovraditya on 11/30/16.

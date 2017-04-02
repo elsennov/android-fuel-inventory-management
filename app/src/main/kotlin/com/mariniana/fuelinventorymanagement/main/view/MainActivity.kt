@@ -1,9 +1,9 @@
-package com.mariniana.fim.main.view
+package com.mariniana.fuelinventorymanagement.main.view
 
-import com.mariniana.fim.MyApplication
-import com.mariniana.fim.R
-import com.mariniana.fim.main.MainActivityPresenter
-import com.mariniana.fim.utils.LogUtils
+import com.mariniana.fuelinventorymanagement.MyApplication
+import com.mariniana.fuelinventorymanagement.R
+import com.mariniana.fuelinventorymanagement.main.MainActivityPresenter
+import com.mariniana.fuelinventorymanagement.utils.LogUtils
 import com.trello.navi2.Event
 import com.trello.navi2.NaviComponent
 import com.trello.navi2.component.support.NaviAppCompatActivity

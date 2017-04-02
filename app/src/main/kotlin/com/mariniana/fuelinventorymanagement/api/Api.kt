@@ -1,4 +1,4 @@
-package com.mariniana.fim.api
+package com.mariniana.fuelinventorymanagement.api
 
 /**
  * Created by elsennovraditya on 11/30/16.

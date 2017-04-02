@@ -1,4 +1,4 @@
-package com.mariniana.fim.api.error
+package com.mariniana.fuelinventorymanagement.api.error
 
 /**
  * Created by elsennovraditya on 12/13/16.

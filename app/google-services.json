@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "755502800280",
+    "firebase_url": "https://fuelinventorymanagement.firebaseio.com",
+    "project_id": "fuelinventorymanagement",
+    "storage_bucket": "fuelinventorymanagement.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:755502800280:android:a40a963b191a4096",
+        "android_client_info": {
+          "package_name": "com.mariniana.fuelinventorymanagement"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "755502800280-t2b30v9192nmf5odhbrh0ctvngau66qf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6WXpvM8Cgob9YKxB9GcXUBH4cnTRs11M"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
