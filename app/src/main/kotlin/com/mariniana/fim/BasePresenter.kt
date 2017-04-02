@@ -1,7 +1,6 @@
 package com.mariniana.fim
 
 import com.mariniana.fim.api.error.*
-import com.novraditya.fim.api.error.*
 import io.reactivex.Observable
 import io.reactivex.functions.Function
 

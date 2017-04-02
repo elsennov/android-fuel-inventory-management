@@ -2,7 +2,6 @@ package com.mariniana.fim
 
 import android.app.Application
 import com.mariniana.fim.utils.LogUtils
-import com.novraditya.fim.DaggerFimComponent
 
 /**
  * Created by elsennovraditya on 11/30/16.

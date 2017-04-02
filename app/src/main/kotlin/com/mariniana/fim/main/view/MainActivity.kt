@@ -1,7 +1,7 @@
 package com.mariniana.fim.main.view
 
 import com.mariniana.fim.MyApplication
-import com.novraditya.fim.R
+import com.mariniana.fim.R
 import com.mariniana.fim.main.MainActivityPresenter
 import com.mariniana.fim.utils.LogUtils
 import com.trello.navi2.Event

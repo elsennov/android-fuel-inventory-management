@@ -26,8 +26,6 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
-        test.java.srcDirs += 'src/test/kotlin'
-        androidTest.java.srcDirs += 'src/androidTest/kotlin'
     }
 
     packagingOptions {
@@ -45,7 +43,6 @@ def rxJava2Version = '2.0.6'
 def rxAndroidVersion = '2.0.1'
 def rxNavi2Version = '2.0'
 def rxBindingVersion = '2.0.0'
-def rxJava2InteropVersion = '0.6.1'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])

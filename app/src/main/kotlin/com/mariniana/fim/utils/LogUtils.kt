@@ -16,14 +16,14 @@ object LogUtils {
     }
 
     fun debug(tag: String, message: String) {
-        if (com.mariniana.fim.LogUtils.enableLogging) {
-            Log.d(com.mariniana.fim.LogUtils.logTag, tag + " - " + message)
+        if (LogUtils.enableLogging) {
+            Log.d(LogUtils.logTag, tag + " - " + message)
         }
     }
 
     fun error(tag: String, message: String, throwable: Throwable) {
-        if (com.mariniana.fim.LogUtils.enableLogging) {
-            Log.e(com.mariniana.fim.LogUtils.logTag, tag + " - " + message, throwable)
+        if (LogUtils.enableLogging) {
+            Log.e(LogUtils.logTag, tag + " - " + message, throwable)
         }
     }
 

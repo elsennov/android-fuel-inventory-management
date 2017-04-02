@@ -3,7 +3,7 @@ package com.mariniana.fim.api
 import android.app.Application
 import android.content.Context
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import com.novraditya.fim.BuildConfig
+import com.mariniana.fim.BuildConfig
 import com.mariniana.fim.utils.LogUtils
 import com.mariniana.fim.utils.buildGson
 import com.mariniana.fim.utils.isNetworkAvailable
