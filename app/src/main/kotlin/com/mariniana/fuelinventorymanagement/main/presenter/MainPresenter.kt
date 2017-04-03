@@ -37,4 +37,8 @@ open class MainPresenter(private val apiManager: ApiManager,
         return firebaseManager.requestRefillObservable(refillId, System.currentTimeMillis())
     }
 
+    fun listenToRefillRequest() {
+        firebaseManager.subscribeToTopic("refill_request")
+    }
+
 }

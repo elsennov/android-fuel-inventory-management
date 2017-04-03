@@ -42,7 +42,20 @@ class SupplierFragment : NaviFragment() {
     }
 
     init {
+        initListenToRefillRequest()
         initSendFuel()
+    }
+
+    private fun initListenToRefillRequest() {
+        RxNavi
+            .observe(naviComponent, Event.VIEW_CREATED)
+            .doOnNext { mainPresenter.listenToRefillRequest() }
+            .takeUntil(RxNavi.observe(naviComponent, Event.DESTROY_VIEW))
+            .subscribe(
+                { LogUtils.debug(TAG, "onNext in initListenToRefillRequest") },
+                { LogUtils.error(TAG, "onError in initListenToRefillRequest", it) },
+                { LogUtils.debug(TAG, "onComplete in initListenToRefillRequest") }
+            )
     }
 
     private fun initSendFuel() {
@@ -66,13 +79,14 @@ class SupplierFragment : NaviFragment() {
                     }
                     .filter { it }
             }
+            .takeUntil(RxNavi.observe(naviComponent, Event.DESTROY_VIEW))
             .subscribe(
                 {
-                    LogUtils.debug(TAG, "onNext in initLogout")
+                    LogUtils.debug(TAG, "onNext in initSendFuel")
                     send_fuel.isEnabled = false
                 },
-                { LogUtils.error(TAG, "onError in initLogout", it) },
-                { LogUtils.debug(TAG, "onComplete in initLogout") }
+                { LogUtils.error(TAG, "onError in initSendFuel", it) },
+                { LogUtils.debug(TAG, "onComplete in initSendFuel") }
             )
     }
 

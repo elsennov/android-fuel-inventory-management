@@ -65,6 +65,7 @@ class RequestRefillFragment : SellerContentFragment() {
                     }
                     .filter { it }
             }
+            .takeUntil(RxNavi.observe(naviComponent, Event.DESTROY_VIEW))
             .subscribe(
                 {
                     LogUtils.debug(TAG, "onNext in initRequestRefillButton")

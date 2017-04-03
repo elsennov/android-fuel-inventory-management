@@ -73,6 +73,7 @@ class MainActivity : NaviAppCompatActivity() {
             .observe(naviComponent, Event.CREATE)
             .flatMap { logoutPubSub }
             .flatMap { mainPresenter.logoutObservable() }
+            .takeUntil(RxNavi.observe(naviComponent, Event.DESTROY))
             .subscribe(
                 {
                     LogUtils.debug(tag, "onNext in initLogout")

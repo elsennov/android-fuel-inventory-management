@@ -6,6 +6,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.mariniana.fuelinventorymanagement.login.model.User
 import com.mariniana.fuelinventorymanagement.main.model.Refill
@@ -19,6 +20,7 @@ import io.reactivex.Observable
 class FirebaseManager(private val gson: Gson) {
 
     private val tag = FirebaseManager::class.java.simpleName
+    private val subscribedTopics = mutableListOf<String>()
 
     companion object {
         private const val REF_REGISTRATION_IDS = "registration_ids"
@@ -54,8 +56,9 @@ class FirebaseManager(private val gson: Gson) {
 
     fun logoutObservable(): Observable<Boolean> {
         return Observable.create { subscriber ->
-            val firebaseAuth = FirebaseAuth.getInstance()
-            firebaseAuth.signOut()
+            subscribedTopics.forEach { FirebaseMessaging.getInstance().unsubscribeFromTopic(it) }
+
+            FirebaseAuth.getInstance().signOut()
             subscriber.onNext(true)
             subscriber.onComplete()
         }
@@ -266,6 +269,13 @@ class FirebaseManager(private val gson: Gson) {
 
     fun getCurrentUserId(): String? {
         return FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    }
+
+    fun subscribeToTopic(topic: String) {
+        if (!subscribedTopics.contains(topic)) {
+            subscribedTopics.add(topic)
+        }
+        FirebaseMessaging.getInstance().subscribeToTopic(topic)
     }
 
 }
