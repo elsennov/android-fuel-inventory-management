@@ -41,4 +41,8 @@ open class MainPresenter(private val apiManager: ApiManager,
         firebaseManager.subscribeToTopic("refill_request")
     }
 
+    fun getCurrentVolumeObservable(): Observable<Double> {
+        return firebaseManager.getCurrentVolumeObservable()
+    }
+
 }

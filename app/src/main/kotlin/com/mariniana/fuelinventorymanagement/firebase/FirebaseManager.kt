@@ -29,6 +29,7 @@ class FirebaseManager(private val gson: Gson) {
         private const val REF_TANKS = "tanks"
         private const val REF_USERS = "users"
         private const val REF_ROLE = "role"
+        private const val REF_REFILL_REQUESTS = "refill_requests"
     }
 
     fun loginObservable(email: String, password: String): Observable<User> {
@@ -64,29 +65,54 @@ class FirebaseManager(private val gson: Gson) {
         }
     }
 
-    fun getCurrentHeightObservable(): Observable<Float> {
+    fun getCurrentHeightObservable(): Observable<Double> {
         return keepTokenFreshObservable()
             .flatMap {
-                Observable.create<String> { subscriber ->
+                Observable.create<Double> { subscriber ->
                     val firebaseDatabase = FirebaseDatabase.getInstance()
                     firebaseDatabase
                         .getReference(REF_TANKS)
                         .child(Tank.ID)
                         .addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onCancelled(onCancelled: DatabaseError?) {
-                                LogUtils.debug(tag, "Failure in getCurrentHeight")
+                                LogUtils.debug(tag, "Failure in getCurrentHeightObservable")
                                 subscriber.onError(onCancelled?.toException() ?: Throwable())
                             }
 
                             override fun onDataChange(dataSnapshot: DataSnapshot?) {
-                                LogUtils.debug(tag, "onDataChange in getCurrentHeight")
-                                subscriber.onNext(dataSnapshot.toString())
+                                LogUtils.debug(tag, "onDataChange in getCurrentHeightObservable")
+                                val tank = (dataSnapshot?.value as HashMap<String, Any>?)
+                                subscriber.onNext(tank?.get(Tank.CURRENT_HEIGHT) as Double? ?: 0.0)
                                 subscriber.onComplete()
                             }
                         })
                 }
             }
-            .map { 0f }
+    }
+
+    fun getCurrentVolumeObservable(): Observable<Double> {
+        return keepTokenFreshObservable()
+            .flatMap {
+                Observable.create<Double> { subscriber ->
+                    val firebaseDatabase = FirebaseDatabase.getInstance()
+                    firebaseDatabase
+                        .getReference(REF_TANKS)
+                        .child(Tank.ID)
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onCancelled(onCancelled: DatabaseError?) {
+                                LogUtils.debug(tag, "Failure in getCurrentVolumeObservable")
+                                subscriber.onError(onCancelled?.toException() ?: Throwable())
+                            }
+
+                            override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                                LogUtils.debug(tag, "onDataChange in getCurrentVolumeObservable")
+                                val tank = (dataSnapshot?.value as HashMap<String, Any>?)
+                                subscriber.onNext(tank?.get(Tank.CURRENT_VOLUME) as Double? ?: 0.0)
+                                subscriber.onComplete()
+                            }
+                        })
+                }
+            }
     }
 
     fun registerFcmObservable(): Observable<Boolean> {
@@ -225,6 +251,29 @@ class FirebaseManager(private val gson: Gson) {
 
     fun requestRefillObservable(refillId: String, currentTimeMillis: Long): Observable<Boolean> {
         return keepTokenFreshObservable()
+            .flatMap {
+                Observable.create<Boolean> { subscriber ->
+                    val firebaseDatabase = FirebaseDatabase.getInstance()
+                    val refillRequest = HashMap<String, Any>()
+                    refillRequest.put("message", "Please refill")
+
+                    firebaseDatabase
+                        .getReference(REF_REFILL_REQUESTS)
+                        .child(currentTimeMillis.toString())
+                        .setValue(
+                            refillRequest,
+                            {
+                                databaseError, _ ->
+                                if (databaseError != null) {
+                                    subscriber.onError(databaseError.toException())
+                                } else {
+                                    subscriber.onNext(true)
+                                    subscriber.onComplete()
+                                }
+                            }
+                        )
+                }
+            }
             .flatMap {
                 Observable.create<Boolean> { subscriber ->
                     val firebaseDatabase = FirebaseDatabase.getInstance()

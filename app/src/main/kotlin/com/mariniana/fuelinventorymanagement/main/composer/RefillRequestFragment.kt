@@ -19,17 +19,17 @@ import kotlinx.android.synthetic.main.fragment_request_refill.*
 /**
  * Created by elsennovraditya on 4/3/17.
  */
-class RequestRefillFragment : SellerContentFragment() {
+class RefillRequestFragment : SellerContentFragment() {
 
     companion object {
-        private val TAG = RequestRefillFragment::class.java.simpleName
+        private val TAG = RefillRequestFragment::class.java.simpleName
         const val REFILL_ID = "refill_id"
 
-        fun getInstance(refillId: String): RequestRefillFragment {
+        fun getInstance(refillId: String): RefillRequestFragment {
             val bundle = Bundle()
             bundle.putString(REFILL_ID, refillId)
 
-            val requestRefillFragment = RequestRefillFragment()
+            val requestRefillFragment = RefillRequestFragment()
             requestRefillFragment.arguments = bundle
             return requestRefillFragment
         }

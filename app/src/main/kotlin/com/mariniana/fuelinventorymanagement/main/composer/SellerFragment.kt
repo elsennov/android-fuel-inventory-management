@@ -55,7 +55,7 @@ class SellerFragment : NaviFragment() {
     private fun getSellerContentFragmentList(): MutableList<SellerContentFragment> {
         val supplierFragmentList = mutableListOf<SellerContentFragment>()
         supplierFragmentList.add(MonitorFragment())
-        supplierFragmentList.add(RequestRefillFragment.getInstance(arguments.getString(REFILL_ID, "")))
+        supplierFragmentList.add(RefillRequestFragment.getInstance(arguments.getString(REFILL_ID, "")))
         return supplierFragmentList
     }
 
