@@ -8,6 +8,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.gson.Gson
 import com.mariniana.fuelinventorymanagement.login.model.User
+import com.mariniana.fuelinventorymanagement.main.model.Refill
 import com.mariniana.fuelinventorymanagement.main.model.Tank
 import com.mariniana.fuelinventorymanagement.utils.LogUtils
 import io.reactivex.Observable
@@ -15,7 +16,7 @@ import io.reactivex.Observable
 /**
  * Created by elsennovraditya on 4/2/17.
  */
-class FirebaseManager(gson: Gson) {
+class FirebaseManager(private val gson: Gson) {
 
     private val tag = FirebaseManager::class.java.simpleName
 
@@ -24,6 +25,8 @@ class FirebaseManager(gson: Gson) {
         private const val REF_REGISTRATION_ID = "registration_id"
         private const val REF_REFILLS = "refills"
         private const val REF_TANKS = "tanks"
+        private const val REF_USERS = "users"
+        private const val REF_ROLE = "role"
     }
 
     fun loginObservable(email: String, password: String): Observable<User> {
@@ -46,6 +49,15 @@ class FirebaseManager(gson: Gson) {
                     LogUtils.debug(tag, "Failure in loginObservable")
                     subscriber.onError(it)
                 }
+        }
+    }
+
+    fun logoutObservable(): Observable<Boolean> {
+        return Observable.create { subscriber ->
+            val firebaseAuth = FirebaseAuth.getInstance()
+            firebaseAuth.signOut()
+            subscriber.onNext(true)
+            subscriber.onComplete()
         }
     }
 
@@ -95,6 +107,56 @@ class FirebaseManager(gson: Gson) {
                                 }
                             }
                         )
+                }
+            }
+    }
+
+    fun getUserRoleObservable(): Observable<String> {
+        return keepTokenFreshObservable()
+            .flatMap {
+                Observable.create<String> { subscriber ->
+                    val firebaseDatabase = FirebaseDatabase.getInstance()
+                    firebaseDatabase
+                        .getReference(REF_USERS)
+                        .child(FirebaseAuth.getInstance().currentUser?.uid ?: "")
+                        .child(REF_ROLE)
+                        .addValueEventListener(object : ValueEventListener {
+                            override fun onCancelled(onCancelled: DatabaseError?) {
+                                LogUtils.debug(tag, "Failure in getCurrentHeight")
+                                subscriber.onError(onCancelled?.toException() ?: Throwable())
+                            }
+
+                            override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                                LogUtils.debug(tag, "onDataChange in getCurrentHeight")
+                                subscriber.onNext(dataSnapshot.toString())
+                                subscriber.onComplete()
+                            }
+                        })
+                }
+            }
+    }
+
+    fun getLatestRefillObservable(): Observable<Refill> {
+        return keepTokenFreshObservable()
+            .flatMap {
+                Observable.create<Refill> { subscriber ->
+                    val firebaseDatabase = FirebaseDatabase.getInstance()
+                    firebaseDatabase
+                        .getReference(REF_REFILLS)
+                        .orderByKey()
+                        .limitToLast(1)
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onCancelled(onCancelled: DatabaseError?) {
+                                LogUtils.debug(tag, "Failure in getCurrentHeight")
+                                subscriber.onError(onCancelled?.toException() ?: Throwable())
+                            }
+
+                            override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                                LogUtils.debug(tag, "onDataChange in getCurrentHeight")
+                                subscriber.onNext(gson.fromJson(dataSnapshot.toString(), Refill::class.java))
+                                subscriber.onComplete()
+                            }
+                        })
                 }
             }
     }
