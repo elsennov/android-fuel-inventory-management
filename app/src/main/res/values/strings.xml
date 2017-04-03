@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Recipee</string>
+    <string name="app_name">Fuel Inventory Management</string>
     <string name="error_retrieving_recipes">Error while retrieving recipes!</string>
     <string name="error_recipes_empty">Recipes is empty!</string>
     <string name="error_network">network problem! Make sure you are connected to internet!</string>

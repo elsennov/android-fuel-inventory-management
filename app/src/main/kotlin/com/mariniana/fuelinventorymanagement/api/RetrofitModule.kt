@@ -2,10 +2,10 @@ package com.mariniana.fuelinventorymanagement.api
 
 import android.app.Application
 import android.content.Context
+import com.google.gson.Gson
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.mariniana.fuelinventorymanagement.BuildConfig
 import com.mariniana.fuelinventorymanagement.utils.LogUtils
-import com.mariniana.fuelinventorymanagement.utils.buildGson
 import com.mariniana.fuelinventorymanagement.utils.isNetworkAvailable
 import dagger.Module
 import dagger.Provides
@@ -44,12 +44,12 @@ class RetrofitModule() {
 
     @Singleton
     @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideRetrofit(okHttpClient: OkHttpClient, gson: Gson): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
             .baseUrl(BuildConfig.BASE_URL)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-            .addConverterFactory(GsonConverterFactory.create(buildGson()))
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 

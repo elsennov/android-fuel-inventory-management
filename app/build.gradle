@@ -13,6 +13,8 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "BASE_URL", "\"https://fuelinventorymanagement.firebaseio.com\""
     }
 
     buildTypes {
@@ -54,6 +56,7 @@ dependencies {
     compile "com.google.firebase:firebase-core:${firebaseVersion}"
     compile "com.google.firebase:firebase-database:${firebaseVersion}"
     compile "com.google.firebase:firebase-messaging:${firebaseVersion}"
+    compile "com.google.firebase:firebase-auth:${firebaseVersion}"
 
     // Kotlin
     compile 'org.jetbrains.kotlin:kotlin-stdlib:1.1.1'
