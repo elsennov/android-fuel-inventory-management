@@ -11,28 +11,27 @@ import com.mariniana.fuelinventorymanagement.main.model.Refill
 import com.mariniana.fuelinventorymanagement.main.presenter.MainPresenter
 import com.mariniana.fuelinventorymanagement.utils.LogUtils
 import com.trello.navi2.Event
-import com.trello.navi2.component.support.NaviFragment
 import com.trello.navi2.rx.RxNavi
 import io.reactivex.Observable
 import io.reactivex.functions.Function
-import kotlinx.android.synthetic.main.fragment_supplier.*
+import kotlinx.android.synthetic.main.fragment_request_refill.*
 
 /**
- * Created by elsennovraditya on 4/2/17.
+ * Created by elsennovraditya on 4/3/17.
  */
-class SupplierFragment : NaviFragment() {
+class RequestRefillFragment : SellerContentFragment() {
 
     companion object {
-        private val TAG = SupplierFragment::class.java.simpleName
+        private val TAG = RequestRefillFragment::class.java.simpleName
         const val REFILL_ID = "refill_id"
 
-        fun getInstance(refillId: String): SupplierFragment {
+        fun getInstance(refillId: String): RequestRefillFragment {
             val bundle = Bundle()
             bundle.putString(REFILL_ID, refillId)
 
-            val supplierFragment = SupplierFragment()
-            supplierFragment.arguments = bundle
-            return supplierFragment
+            val requestRefillFragment = RequestRefillFragment()
+            requestRefillFragment.arguments = bundle
+            return requestRefillFragment
         }
     }
 
@@ -42,10 +41,10 @@ class SupplierFragment : NaviFragment() {
     }
 
     init {
-        initSendFuel()
+        initRequestRefillButton()
     }
 
-    private fun initSendFuel() {
+    private fun initRequestRefillButton() {
         RxNavi
             .observe(naviComponent, Event.VIEW_CREATED)
             .map { arguments.getString(REFILL_ID, "") }
@@ -54,31 +53,35 @@ class SupplierFragment : NaviFragment() {
                     .getRefillObservable(it)
                     .onErrorResumeNext(Function { Observable.just(Refill.empty) })
             }
-            .doOnNext { send_fuel.isEnabled = it.status == Refill.REQUESTED }
-            .filter { it.status == Refill.REQUESTED }
+            .doOnNext { request_refill.isEnabled = it.status == Refill.NOTIFIED }
+            .filter { it.status == Refill.NOTIFIED }
             .flatMap { (id) ->
                 RxView
-                    .clicks(send_fuel)
+                    .clicks(request_refill)
                     .flatMap {
                         mainPresenter
-                            .sendFuelObservable(id ?: "")
+                            .requestRefillObservable(id ?: "")
                             .onErrorResumeNext(Function { Observable.just(false) })
                     }
                     .filter { it }
             }
             .subscribe(
                 {
-                    LogUtils.debug(TAG, "onNext in initLogout")
-                    send_fuel.isEnabled = false
+                    LogUtils.debug(TAG, "onNext in initRequestRefillButton")
+                    request_refill.isEnabled = false
                 },
-                { LogUtils.error(TAG, "onError in initLogout", it) },
-                { LogUtils.debug(TAG, "onComplete in initLogout") }
+                { LogUtils.error(TAG, "onError in initRequestRefillButton", it) },
+                { LogUtils.debug(TAG, "onComplete in initRequestRefillButton") }
             )
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater?.inflate(R.layout.fragment_supplier, container, false)
+        return inflater?.inflate(R.layout.fragment_request_refill, container, false)
+    }
+
+    override fun getTitle(): String {
+        return "Refill"
     }
 
 }

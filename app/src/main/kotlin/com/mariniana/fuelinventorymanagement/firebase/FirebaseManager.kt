@@ -69,7 +69,7 @@ class FirebaseManager(private val gson: Gson) {
                     firebaseDatabase
                         .getReference(REF_TANKS)
                         .child(Tank.ID)
-                        .addValueEventListener(object : ValueEventListener {
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onCancelled(onCancelled: DatabaseError?) {
                                 LogUtils.debug(tag, "Failure in getCurrentHeight")
                                 subscriber.onError(onCancelled?.toException() ?: Throwable())
@@ -111,7 +111,7 @@ class FirebaseManager(private val gson: Gson) {
             }
     }
 
-    fun getUserRoleObservable(): Observable<String> {
+    fun getCurrentUserRoleObservable(): Observable<String> {
         return keepTokenFreshObservable()
             .flatMap {
                 Observable.create<String> { subscriber ->
@@ -120,15 +120,15 @@ class FirebaseManager(private val gson: Gson) {
                         .getReference(REF_USERS)
                         .child(FirebaseAuth.getInstance().currentUser?.uid ?: "")
                         .child(REF_ROLE)
-                        .addValueEventListener(object : ValueEventListener {
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onCancelled(onCancelled: DatabaseError?) {
-                                LogUtils.debug(tag, "Failure in getCurrentHeight")
+                                LogUtils.debug(tag, "Failure in getCurrentUserRoleObservable")
                                 subscriber.onError(onCancelled?.toException() ?: Throwable())
                             }
 
                             override fun onDataChange(dataSnapshot: DataSnapshot?) {
-                                LogUtils.debug(tag, "onDataChange in getCurrentHeight")
-                                subscriber.onNext(dataSnapshot.toString())
+                                LogUtils.debug(tag, "onDataChange in getCurrentUserRoleObservable")
+                                subscriber.onNext(dataSnapshot?.value as String?)
                                 subscriber.onComplete()
                             }
                         })
@@ -147,16 +147,103 @@ class FirebaseManager(private val gson: Gson) {
                         .limitToLast(1)
                         .addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onCancelled(onCancelled: DatabaseError?) {
-                                LogUtils.debug(tag, "Failure in getCurrentHeight")
+                                LogUtils.debug(tag, "Failure in getLatestRefillObservable")
                                 subscriber.onError(onCancelled?.toException() ?: Throwable())
                             }
 
                             override fun onDataChange(dataSnapshot: DataSnapshot?) {
-                                LogUtils.debug(tag, "onDataChange in getCurrentHeight")
+                                LogUtils.debug(tag, "onDataChange in getLatestRefillObservable: $dataSnapshot")
+                                val refill = (dataSnapshot?.value as HashMap<String, HashMap<String, Any>>?)
+                                val refillId = refill?.keys?.firstOrNull()
+                                subscriber.onNext(Refill(
+                                    refillId,
+                                    refill?.get(refillId)?.get(Refill.STATUS) as String? ?: "",
+                                    refill?.get(refillId)?.get(Refill.UPDATED_AT) as Long? ?: 0
+                                ))
+                                subscriber.onComplete()
+                            }
+                        })
+                }
+            }
+    }
+
+    fun getRefillObservable(refillId: String): Observable<Refill> {
+        return keepTokenFreshObservable()
+            .flatMap {
+                Observable.create<Refill> { subscriber ->
+                    val firebaseDatabase = FirebaseDatabase.getInstance()
+                    firebaseDatabase
+                        .getReference(REF_REFILLS)
+                        .child(refillId)
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onCancelled(onCancelled: DatabaseError?) {
+                                LogUtils.debug(tag, "Failure in getRefillObservable")
+                                subscriber.onError(onCancelled?.toException() ?: Throwable())
+                            }
+
+                            override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                                LogUtils.debug(tag, "onDataChange in getRefillObservable: $dataSnapshot")
                                 subscriber.onNext(gson.fromJson(dataSnapshot.toString(), Refill::class.java))
                                 subscriber.onComplete()
                             }
                         })
+                }
+            }
+    }
+
+    fun sendFuelObservable(refillId: String,
+                           currentTimeMillis: Long): Observable<Boolean> {
+        return keepTokenFreshObservable()
+            .flatMap {
+                Observable.create<Boolean> { subscriber ->
+                    val firebaseDatabase = FirebaseDatabase.getInstance()
+                    val refill = HashMap<String, Any>()
+                    refill.put(Refill.STATUS, Refill.FILLED)
+                    refill.put(Refill.UPDATED_AT, currentTimeMillis)
+
+                    firebaseDatabase
+                        .getReference(REF_REFILLS)
+                        .child(refillId)
+                        .setValue(
+                            refill,
+                            {
+                                databaseError, _ ->
+                                if (databaseError != null) {
+                                    subscriber.onError(databaseError.toException())
+                                } else {
+                                    subscriber.onNext(true)
+                                    subscriber.onComplete()
+                                }
+                            }
+                        )
+                }
+            }
+    }
+
+    fun requestRefillObservable(refillId: String, currentTimeMillis: Long): Observable<Boolean> {
+        return keepTokenFreshObservable()
+            .flatMap {
+                Observable.create<Boolean> { subscriber ->
+                    val firebaseDatabase = FirebaseDatabase.getInstance()
+                    val refill = HashMap<String, Any>()
+                    refill.put(Refill.STATUS, Refill.REQUESTED)
+                    refill.put(Refill.UPDATED_AT, currentTimeMillis)
+
+                    firebaseDatabase
+                        .getReference(REF_REFILLS)
+                        .child(refillId)
+                        .setValue(
+                            refill,
+                            {
+                                databaseError, _ ->
+                                if (databaseError != null) {
+                                    subscriber.onError(databaseError.toException())
+                                } else {
+                                    subscriber.onNext(true)
+                                    subscriber.onComplete()
+                                }
+                            }
+                        )
                 }
             }
     }
@@ -175,6 +262,10 @@ class FirebaseManager(private val gson: Gson) {
                     subscriber.onError(it)
                 }
         }
+    }
+
+    fun getCurrentUserId(): String? {
+        return FirebaseAuth.getInstance().currentUser?.uid ?: ""
     }
 
 }

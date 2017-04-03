@@ -3,6 +3,7 @@ package com.mariniana.fuelinventorymanagement.main.presenter
 import com.mariniana.fuelinventorymanagement.BasePresenter
 import com.mariniana.fuelinventorymanagement.api.ApiManager
 import com.mariniana.fuelinventorymanagement.firebase.FirebaseManager
+import com.mariniana.fuelinventorymanagement.main.model.Refill
 import io.reactivex.Observable
 
 /**
@@ -16,11 +17,11 @@ open class MainPresenter(private val apiManager: ApiManager,
         return firebaseManager.logoutObservable()
     }
 
-    fun getUserRoleObservable(): Observable<String> {
-        return firebaseManager.getUserRoleObservable()
+    fun getCurrentUserRoleObservable(): Observable<String> {
+        return firebaseManager.getCurrentUserRoleObservable()
     }
 
-    fun doesRefillNeededObservable(refillId: String): Observable<Boolean> {
+    fun getRefillObservable(refillId: String): Observable<Refill> {
         if (refillId.isNullOrEmpty()) {
             return firebaseManager.getLatestRefillObservable()
         } else {
@@ -28,8 +29,12 @@ open class MainPresenter(private val apiManager: ApiManager,
         }
     }
 
-    fun sendFuelObservable(): Observable<Boolean> {
+    fun sendFuelObservable(refillId: String): Observable<Boolean> {
+        return firebaseManager.sendFuelObservable(refillId, System.currentTimeMillis())
+    }
 
+    fun requestRefillObservable(refillId: String): Observable<Boolean> {
+        return firebaseManager.requestRefillObservable(refillId, System.currentTimeMillis())
     }
 
 }

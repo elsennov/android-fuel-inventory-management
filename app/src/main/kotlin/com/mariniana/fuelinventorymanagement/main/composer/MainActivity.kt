@@ -33,17 +33,19 @@ class MainActivity : NaviAppCompatActivity() {
         RxNavi
             .observe(naviComponent, Event.CREATE)
             .doOnNext { setContentView(R.layout.activity_main) }
-            .flatMap { mainPresenter.getUserRoleObservable() }
+            .flatMap { mainPresenter.getCurrentUserRoleObservable() }
             .takeUntil(RxNavi.observe(naviComponent, Event.DESTROY))
             .subscribe(
                 {
                     LogUtils.debug(tag, "onNext in initLayout")
                     if (it == User.ROLE_SELLER) {
                         showSellerFragment()
+                        title = "SPBU User"
                     }
 
                     if (it == User.ROLE_SUPPLIER) {
                         showSupplierFragment()
+                        title = "Pertamina User"
                     }
                 },
                 { LogUtils.error(tag, "onError in initLayout", it) },
@@ -52,11 +54,18 @@ class MainActivity : NaviAppCompatActivity() {
     }
 
     private fun showSellerFragment() {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_container, SellerFragment.getInstance(""))
 
+            .commitAllowingStateLoss()
     }
 
     private fun showSupplierFragment() {
-
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_container, SupplierFragment.getInstance(""))
+            .commitAllowingStateLoss()
     }
 
     private fun initLogout() {
