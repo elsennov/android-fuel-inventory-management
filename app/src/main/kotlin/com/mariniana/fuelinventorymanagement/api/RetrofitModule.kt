@@ -26,7 +26,7 @@ import javax.inject.Singleton
  */
 
 @Module
-class RetrofitModule() {
+class RetrofitModule {
 
     private val HTTP_CACHE = "http-cache"
     private val MAX_CACHE_SIZE = (10 * 1024 * 1024).toLong() // 10 MB

@@ -3,7 +3,10 @@ package com.mariniana.fuelinventorymanagement.main.presenter
 import com.mariniana.fuelinventorymanagement.BasePresenter
 import com.mariniana.fuelinventorymanagement.api.ApiManager
 import com.mariniana.fuelinventorymanagement.firebase.FirebaseManager
+import com.mariniana.fuelinventorymanagement.main.model.LowFuelEvent
 import com.mariniana.fuelinventorymanagement.main.model.Refill
+import com.mariniana.fuelinventorymanagement.main.model.RefillRequestEvent
+import io.prismapp.mobile.rx.RxBus
 import io.reactivex.Observable
 
 /**
@@ -37,12 +40,17 @@ open class MainPresenter(private val apiManager: ApiManager,
         return firebaseManager.requestRefillObservable(refillId, System.currentTimeMillis())
     }
 
-    fun listenToRefillRequest() {
+    fun listenToRefillRequestObservable(): Observable<RefillRequestEvent> {
         firebaseManager.subscribeToTopic("refill_request")
+        return RxBus.registerObservable<RefillRequestEvent>()
     }
 
     fun getCurrentVolumeObservable(): Observable<Double> {
         return firebaseManager.getCurrentVolumeObservable()
+    }
+
+    fun listenToLowFuelEventObservable(): Observable<LowFuelEvent> {
+        return RxBus.registerObservable<LowFuelEvent>()
     }
 
 }

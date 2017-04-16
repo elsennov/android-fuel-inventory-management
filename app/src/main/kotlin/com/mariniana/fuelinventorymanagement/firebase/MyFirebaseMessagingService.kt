@@ -12,7 +12,10 @@ import android.support.v4.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.mariniana.fuelinventorymanagement.R
+import com.mariniana.fuelinventorymanagement.main.model.LowFuelEvent
+import com.mariniana.fuelinventorymanagement.main.model.RefillRequestEvent
 import com.mariniana.fuelinventorymanagement.utils.LogUtils
+import io.prismapp.mobile.rx.RxBus
 
 /**
  * Created by elsennovraditya on 4/2/17.
@@ -40,13 +43,22 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         LogUtils.debug(tag, "Message id: " + remoteMessage?.messageId)
         LogUtils.debug(tag, "Message Data: " + remoteMessage?.data)
 
-        val contentIntent = buildMessageContentIntent(this)
-        val notification = buildMessageNotification(this, contentIntent)
+        val notification: Notification
+        if (remoteMessage?.from == FirebaseManager.TOPIC_REFILL_REQUEST) {
+            val contentIntent = buildRefillRequestMessageContentIntent(this)
+            notification = buildRefillRequestMessageNotification(this, contentIntent)
+            RxBus.post(RefillRequestEvent())
+        } else {
+            val contentIntent = buildLowFuelMessageContentIntent(this)
+            notification = buildLowFuelMessageNotification(this, contentIntent)
+            RxBus.post(LowFuelEvent())
+        }
+
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(MESSAGE_NOTIFICATION_ID, notification)
     }
 
-    private fun buildMessageContentIntent(context: Context): PendingIntent {
+    private fun buildRefillRequestMessageContentIntent(context: Context): PendingIntent {
         val intent = Intent(context, NotificationReceiver::class.java)
         intent.action = ACTION
 
@@ -55,7 +67,31 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         )
     }
 
-    private fun buildMessageNotification(context: Context, contentIntent: PendingIntent): Notification {
+    private fun buildRefillRequestMessageNotification(context: Context, contentIntent: PendingIntent): Notification {
+        return NotificationCompat.Builder(context)
+            .setLargeIcon(BitmapFactory.decodeResource(context.resources, R.drawable.ic_format_color_fill_black_24dp))
+            .setSmallIcon(R.drawable.ic_format_color_fill_white_24dp)
+            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+            .setVibrate(longArrayOf(VIBRATION_DELAY, VIBRATION_DURATION))
+            .setLights(ContextCompat.getColor(context, android.R.color.holo_blue_light), LIGHT_ON_MS, LIGHT_OFF_MS)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentTitle("Fuel Inventory Management")
+            .setContentText("Tank Refill Needed!")
+            .setContentIntent(contentIntent)
+            .build()
+    }
+
+    private fun buildLowFuelMessageContentIntent(context: Context): PendingIntent {
+        val intent = Intent(context, NotificationReceiver::class.java)
+        intent.action = ACTION
+
+        return PendingIntent.getBroadcast(
+            context, MESSAGE_NOTIFICATION_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT
+        )
+    }
+
+    private fun buildLowFuelMessageNotification(context: Context, contentIntent: PendingIntent): Notification {
         return NotificationCompat.Builder(context)
             .setLargeIcon(BitmapFactory.decodeResource(context.resources, R.drawable.ic_format_color_fill_black_24dp))
             .setSmallIcon(R.drawable.ic_format_color_fill_white_24dp)

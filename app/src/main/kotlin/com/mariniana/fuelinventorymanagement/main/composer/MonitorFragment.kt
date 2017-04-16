@@ -11,7 +11,9 @@ import com.mariniana.fuelinventorymanagement.utils.LogUtils
 import com.trello.navi2.Event
 import com.trello.navi2.rx.RxNavi
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Function
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_monitor.*
 
 /**
@@ -35,11 +37,13 @@ class MonitorFragment : SellerContentFragment() {
     private fun initCurrentVolume() {
         RxNavi
             .observe(naviComponent, Event.VIEW_CREATED)
+            .observeOn(Schedulers.io())
             .flatMap {
                 mainPresenter
                     .getCurrentVolumeObservable()
                     .onErrorResumeNext(Function { Observable.just(0.0) })
             }
+            .observeOn(AndroidSchedulers.mainThread())
             .takeUntil(RxNavi.observe(naviComponent, Event.DESTROY_VIEW))
             .subscribe(
                 {

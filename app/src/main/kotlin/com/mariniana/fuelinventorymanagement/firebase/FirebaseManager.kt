@@ -1,5 +1,6 @@
 package com.mariniana.fuelinventorymanagement.firebase
 
+import android.os.AsyncTask
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -13,6 +14,12 @@ import com.mariniana.fuelinventorymanagement.main.model.Refill
 import com.mariniana.fuelinventorymanagement.main.model.Tank
 import com.mariniana.fuelinventorymanagement.utils.LogUtils
 import io.reactivex.Observable
+import okhttp3.MediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import org.json.JSONObject
+
 
 /**
  * Created by elsennovraditya on 4/2/17.
@@ -23,6 +30,8 @@ class FirebaseManager(private val gson: Gson) {
     private val subscribedTopics = mutableListOf<String>()
 
     companion object {
+        const val TOPIC_REFILL_REQUEST = "/topics/refill_request"
+
         private const val REF_REGISTRATION_IDS = "registration_ids"
         private const val REF_REGISTRATION_ID = "registration_id"
         private const val REF_REFILLS = "refills"
@@ -30,6 +39,8 @@ class FirebaseManager(private val gson: Gson) {
         private const val REF_USERS = "users"
         private const val REF_ROLE = "role"
         private const val REF_REFILL_REQUESTS = "refill_requests"
+        private const val LEGACY_SERVER_KEY = "AIzaSyBW0MbOxtrTiskzBwAo6esEOhNpr7SNfEM"
+        private val JSON = MediaType.parse("application/json; charset=utf-8")
     }
 
     fun loginObservable(email: String, password: String): Observable<User> {
@@ -231,7 +242,8 @@ class FirebaseManager(private val gson: Gson) {
                     refill.put(Refill.UPDATED_AT, currentTimeMillis)
 
                     firebaseDatabase
-                        .getReference(REF_REFILLS)
+                        .reference
+                        .child(REF_REFILLS)
                         .child(refillId)
                         .setValue(
                             refill,
@@ -282,7 +294,8 @@ class FirebaseManager(private val gson: Gson) {
                     refill.put(Refill.UPDATED_AT, currentTimeMillis)
 
                     firebaseDatabase
-                        .getReference(REF_REFILLS)
+                        .reference
+                        .child(REF_REFILLS)
                         .child(refillId)
                         .setValue(
                             refill,
@@ -296,6 +309,35 @@ class FirebaseManager(private val gson: Gson) {
                                 }
                             }
                         )
+                }
+            }
+            .flatMap {
+                Observable.create<Boolean> { subscriber ->
+                    object : AsyncTask<Unit, Unit, Unit>() {
+                        override fun doInBackground(vararg params: Unit?) {
+                            try {
+                                val client = OkHttpClient()
+                                val json = JSONObject()
+                                val dataJson = JSONObject()
+                                dataJson.put("body", "I need a refill now!")
+                                dataJson.put("title", "Refill Request")
+                                json.put("data", dataJson)
+                                json.put("to", TOPIC_REFILL_REQUEST)
+                                val body = RequestBody.create(JSON, json.toString())
+                                val request = Request.Builder()
+                                    .header("Authorization", "key=" + LEGACY_SERVER_KEY)
+                                    .url("https://fcm.googleapis.com/fcm/send")
+                                    .post(body)
+                                    .build()
+                                val response = client.newCall(request).execute()
+                                val finalResponse = response.body().string()
+                                subscriber.onNext(true)
+                                subscriber.onComplete()
+                            } catch (exception: Exception) {
+                                subscriber.onError(exception)
+                            }
+                        }
+                    }.execute()
                 }
             }
     }

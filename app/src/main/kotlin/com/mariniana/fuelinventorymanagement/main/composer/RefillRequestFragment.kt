@@ -13,7 +13,9 @@ import com.mariniana.fuelinventorymanagement.utils.LogUtils
 import com.trello.navi2.Event
 import com.trello.navi2.rx.RxNavi
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Function
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_request_refill.*
 
 /**
@@ -41,30 +43,56 @@ class RefillRequestFragment : SellerContentFragment() {
     }
 
     init {
+        initListenToLowFuelEvent()
         initRequestRefillButton()
+    }
+
+    private fun initListenToLowFuelEvent() {
+        RxNavi
+            .observe(naviComponent, Event.VIEW_CREATED)
+            .observeOn(Schedulers.io())
+            .flatMap { mainPresenter.listenToLowFuelEventObservable() }
+            .observeOn(AndroidSchedulers.mainThread())
+            .takeUntil(RxNavi.observe(naviComponent, Event.DESTROY_VIEW))
+            .subscribe(
+                {
+                    LogUtils.debug(TAG, "onNext in initListenToLowFuelEvent")
+                    request_refill.isEnabled = true
+                },
+                { LogUtils.error(TAG, "onError in initListenToLowFuelEvent", it) },
+                { LogUtils.debug(TAG, "onComplete in initListenToLowFuelEvent") }
+            )
     }
 
     private fun initRequestRefillButton() {
         RxNavi
             .observe(naviComponent, Event.VIEW_CREATED)
+            .observeOn(Schedulers.io())
             .map { arguments.getString(REFILL_ID, "") }
             .flatMap {
                 mainPresenter
                     .getRefillObservable(it)
                     .onErrorResumeNext(Function { Observable.just(Refill.empty) })
             }
+            .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { request_refill.isEnabled = it.status == Refill.NOTIFIED }
-            .filter { it.status == Refill.NOTIFIED }
-            .flatMap { (id) ->
+            .flatMap {
                 RxView
                     .clicks(request_refill)
+                    .observeOn(Schedulers.io())
                     .flatMap {
                         mainPresenter
-                            .requestRefillObservable(id ?: "")
+                            .getRefillObservable("")
+                            .onErrorResumeNext(Function { Observable.just(Refill.empty) })
+                    }
+                    .flatMap {
+                        mainPresenter
+                            .requestRefillObservable(it.id ?: "")
                             .onErrorResumeNext(Function { Observable.just(false) })
                     }
                     .filter { it }
             }
+            .observeOn(AndroidSchedulers.mainThread())
             .takeUntil(RxNavi.observe(naviComponent, Event.DESTROY_VIEW))
             .subscribe(
                 {
