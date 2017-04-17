@@ -109,7 +109,7 @@ class FirebaseManager(private val gson: Gson) {
                     firebaseDatabase
                         .getReference(REF_TANKS)
                         .child(Tank.ID)
-                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                        .addValueEventListener(object : ValueEventListener {
                             override fun onCancelled(onCancelled: DatabaseError?) {
                                 LogUtils.debug(tag, "Failure in getCurrentVolumeObservable")
                                 subscriber.onError(onCancelled?.toException() ?: Throwable())
@@ -119,7 +119,6 @@ class FirebaseManager(private val gson: Gson) {
                                 LogUtils.debug(tag, "onDataChange in getCurrentVolumeObservable")
                                 val tank = (dataSnapshot?.value as HashMap<String, Any>?)
                                 subscriber.onNext(tank?.get(Tank.CURRENT_VOLUME) as Double? ?: 0.0)
-                                subscriber.onComplete()
                             }
                         })
                 }
