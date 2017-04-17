@@ -48,7 +48,7 @@ class MonitorFragment : SellerContentFragment() {
             .subscribe(
                 {
                     LogUtils.debug(TAG, "onNext in initCurrentVolume")
-                    current_volume.text = "$it ML"
+                    current_volume.text = "$it L"
                 },
                 { LogUtils.error(TAG, "onError in initCurrentVolume", it) },
                 { LogUtils.debug(TAG, "onComplete in initCurrentVolume") }

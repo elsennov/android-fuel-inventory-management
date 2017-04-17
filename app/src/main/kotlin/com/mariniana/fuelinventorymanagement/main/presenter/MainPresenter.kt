@@ -46,7 +46,11 @@ open class MainPresenter(private val apiManager: ApiManager,
     }
 
     fun getCurrentVolumeObservable(): Observable<Double> {
-        return firebaseManager.getCurrentVolumeObservable()
+        return firebaseManager
+            .getCurrentVolumeObservable()
+            .map { it / 10.0 }
+            .map { Math.round(it) }
+            .map { it / 100.0 }
     }
 
     fun listenToLowFuelEventObservable(): Observable<LowFuelEvent> {
